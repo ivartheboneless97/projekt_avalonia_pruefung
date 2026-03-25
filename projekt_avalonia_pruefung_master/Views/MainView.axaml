@@ -1,0 +1,108 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:projekt_avalonia_pruefung_master.ViewModels"
+             
+             xmlns:conv="using:projekt_avalonia_pruefung_master.Converters"
+             x:Class="projekt_avalonia_pruefung_master.Views.MainView"
+             x:DataType="vm:MainViewModel">
+
+    <UserControl.Resources>
+        <conv:BoolToColorConverter x:Key="BoolToColorConverter"/>
+        <conv:BudgetToColorConverter x:Key="BudgetToColorConverter"/>
+    </UserControl.Resources>
+
+    <ScrollViewer Background="#1a1a1a">
+        <StackPanel Margin="20" Spacing="20">
+            
+            <TextBlock Text="Dein Finanz-Planer" FontSize="28" FontWeight="ExtraBold" 
+                       HorizontalAlignment="Center" Foreground="#3498db"/>
+
+            <Grid ColumnDefinitions="*, *">
+                <Border Grid.Column="0" Background="#2c3e50" CornerRadius="12" Padding="15" Margin="0,0,5,0">
+                    <StackPanel>
+                        <TextBlock Text="Kontostand (Gesamt)" FontSize="12" Foreground="#bdc3c7"/>
+                        <TextBlock Text="{Binding Kontostand, StringFormat={}{0:N2} €}" 
+                                   FontSize="20" FontWeight="Bold" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+                
+                <Border Grid.Column="1" CornerRadius="12" Padding="15" Margin="5,0,0,0"
+                        Background="{Binding VerfuegbaresBudget, Converter={StaticResource BudgetToColorConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="Nach Fixkosten übrig:" FontSize="12" Foreground="#ecf0f1"/>
+                        <TextBlock Text="{Binding VerfuegbaresBudget, StringFormat={}{0:N2} €}" 
+                                   FontSize="20" FontWeight="Bold" Foreground="White"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border Background="#34495e" CornerRadius="12" Padding="15">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Neue Buchung" FontWeight="Bold" FontSize="16" Foreground="White"/>
+                    <TextBox Watermark="Beschreibung (z.B. Miete)" Text="{Binding NeueBeschreibung}" Background="White" Foreground="Black">
+                        <TextBox.Resources>
+                            <SolidColorBrush x:Key="TextControlBackgroundFocused">White</SolidColorBrush>
+                            <SolidColorBrush x:Key="TextControlForegroundFocused">Black</SolidColorBrush>
+                        </TextBox.Resources>
+                    </TextBox>
+                    <Grid ColumnDefinitions="*, Auto">
+                        <NumericUpDown Name="BetragInput"
+               Grid.Column="0" 
+               Value="{Binding NeuerBetrag}" 
+               FormatString="0.00" 
+               GotFocus="BetragInput_GotFocus"
+               Margin="0,0,10,0" 
+               Background="White" 
+               Foreground="Black">
+    <NumericUpDown.Resources>
+        <SolidColorBrush x:Key="TextControlBackgroundFocused">White</SolidColorBrush>
+        <SolidColorBrush x:Key="TextControlForegroundFocused">Black</SolidColorBrush>
+    </NumericUpDown.Resources>
+</NumericUpDown>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                             <TextBlock Text="Fixkosten?" VerticalAlignment="Center" Foreground="White"/>
+                             <CheckBox IsChecked="{Binding IstFixkosten}"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid ColumnDefinitions="*, *">
+                        <ToggleSwitch Grid.Column="0" OnContent="Ausgabe" OffContent="Einnahme" IsChecked="{Binding IstNeueAusgabe}" Foreground="White"/>
+                        <Button Grid.Column="1" Content="Speichern" Command="{Binding SpeichernCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="#3498db" Foreground="White" FontWeight="Bold"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="Letzte Buchungen" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+            <ListBox ItemsSource="{Binding Transaktionen}" Background="Transparent" BorderThickness="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+<Border Background="#2b3b4b" CornerRadius="5" Margin="0,2" Padding="10">
+    <Grid ColumnDefinitions="*, Auto, Auto">
+        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Beschreibung}" FontWeight="Bold" Foreground="White"/>
+            <TextBlock Text="Fixkosten" FontSize="10" Foreground="#3498db" 
+                       IsVisible="{Binding IstFixkosten}"/>
+        </StackPanel>
+
+        <TextBlock Grid.Column="1" 
+                   Text="{Binding Betrag, StringFormat={}{0:N2} €}" 
+                   VerticalAlignment="Center" 
+                   Margin="20,0"
+                   Foreground="White"/>
+
+        <Button Grid.Column="2"
+                Command="{Binding $parent[UserControl].DataContext.LoeschenCommand}"
+                CommandParameter="{Binding .}"
+                Content="×"
+                FontSize="20"
+                Background="Transparent"
+                Foreground="Red"
+                Padding="5,0"
+                VerticalAlignment="Center"/>
+    </Grid>
+</Border>
+</DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
